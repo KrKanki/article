@@ -23,29 +23,23 @@ import java.util.Set;
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy")
 })
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Article {
+public class Article extends AuditingFileds {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // 게시글 ID
 
 
-    @Setter @Column(nullable = false, length = 500) private String title;
-    @Setter @Column(nullable = false, length = 10000) private String content;
+    @Setter @Column(nullable = false, length = 500) private String title; // 게시글 제목
+    @Setter @Column(nullable = false, length = 10000) private String content; // 게시글 내용
 
-    @Setter private String hashtag;
+    @Setter private String hashtag; // 게시글 해시태그
 
     @OrderBy("id")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
-
-    @CreatedDate @Column(nullable = false)  private LocalDateTime createdAt;
-    @CreatedBy @Column(nullable = false, length = 100)  private String createdBy;
-    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt;
-    @LastModifiedBy @Column(nullable = false, length = 100) private String modifiedBy;
+    private final Set<ArticleComment> articleComments = new LinkedHashSet<>(); // 게시글 댓글
 
     protected Article() {
     }

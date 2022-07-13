@@ -20,20 +20,15 @@ import java.util.Objects;
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy")
 })
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class ArticleComment {
+public class ArticleComment extends AuditingFileds{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Setter @ManyToOne(optional = false) private Article article;
-    @Setter @Column(nullable = false, length = 500)private String content;
+    private Long id; // 댓글 ID
+    @Setter @ManyToOne(optional = false) private Article article; // 댓글달린 게시글
+    @Setter @Column(nullable = false, length = 500)private String content; // 댓글 내용
 
-    @CreatedDate @Column(nullable = false) LocalDateTime createdAt;
-    @LastModifiedDate @Column(nullable = false, length = 100) private  String createdBy;
-    @CreatedBy @Column(nullable = false)   LocalDateTime modifiedAt;
-    @LastModifiedBy @Column(nullable = false, length = 100) private String modifiedBy;
 
     protected ArticleComment() {
     }
