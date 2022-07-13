@@ -83,13 +83,12 @@ class JpaRepositoryTest {
         long previousArticleComment = articleCommentRepository.count();
         int deletedCommentSize = article.getArticleComments().size();
 
-
         // When
         articleRepository.delete(article);
-
 
         // Then
         assertThat(articleRepository.count()).isEqualTo(previousArticleCount-1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousArticleComment-deletedCommentSize);
+
     }
 }
