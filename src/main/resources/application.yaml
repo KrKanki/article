@@ -25,3 +25,7 @@ spring:
   data.rest:
       base-path: /api
       detection-strategy: annotated
+  thymeleaf.cache: false
+  devtools.livereload.enabled: true
+  thymeleaf3:
+    decoupled-logic: true
