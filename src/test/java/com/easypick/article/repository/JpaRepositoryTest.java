@@ -2,6 +2,10 @@ package com.easypick.article.repository;
 
 import com.easypick.article.config.JpaConfig;
 import com.easypick.article.domain.Article;
+import com.easypick.article.domain.UserAccount;
+import com.easypick.article.repository.ArticleCommentRepository;
+import com.easypick.article.repository.ArticleRepository;
+import com.easypick.article.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,85 +14,86 @@ import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("JPA 연결 테스트")
-@DataJpaTest
 @Import(JpaConfig.class)
+@DataJpaTest
 class JpaRepositoryTest {
-
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
-    public JpaRepositoryTest(@Autowired ArticleRepository articleRepository,
-                             @Autowired ArticleCommentRepository articleCommentRepository) {
+    public JpaRepositoryTest(
+            @Autowired ArticleRepository articleRepository,
+            @Autowired ArticleCommentRepository articleCommentRepository,
+            @Autowired UserAccountRepository userAccountRepository
+    ) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @DisplayName("select 테스트")
     @Test
-    void givenTestData_whenSelecting_thenWorkFine(){
-
+    void givenTestData_whenSelecting_thenWorksFine() {
         // Given
 
         // When
-        List<Article> articleList = articleRepository.findAll();
+        List<Article> articles = articleRepository.findAll();
 
         // Then
-        assertThat(articleList)
+        assertThat(articles)
                 .isNotNull()
                 .hasSize(123);
     }
+
     @DisplayName("insert 테스트")
     @Test
-    void givenTestData_whenInserting_thenWorkFine(){
-
+    void givenTestData_whenInserting_thenWorksFine() {
         // Given
         long previousCount = articleRepository.count();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("uno", "pw", null, null, null));
+        Article article = Article.of(userAccount, "new article", "new content", "#spring");
 
         // When
-        articleRepository.save(Article.of("Article Title", "Article Content", "#Spring"));
-
+        articleRepository.save(article);
 
         // Then
-        assertThat(articleRepository.count()).isEqualTo(previousCount+1);
+        assertThat(articleRepository.count()).isEqualTo(previousCount + 1);
     }
 
     @DisplayName("update 테스트")
     @Test
-    void givenTestData_whenUpdating_thenWorkFine(){
-
+    void givenTestData_whenUpdating_thenWorksFine() {
         // Given
         Article article = articleRepository.findById(1L).orElseThrow();
-        String updatedHashTage = "#SpringBoot";
-        article.setHashtag(updatedHashTage);
+        String updatedHashtag = "#springboot";
+        article.setHashtag(updatedHashtag);
 
         // When
         Article savedArticle = articleRepository.saveAndFlush(article);
 
-
         // Then
-        assertThat(savedArticle).hasFieldOrPropertyWithValue("hashtag", updatedHashTage);
+        assertThat(savedArticle).hasFieldOrPropertyWithValue("hashtag", updatedHashtag);
     }
 
     @DisplayName("delete 테스트")
     @Test
-    void givenTestData_whenDeleting_thenWorkFine(){
-
+    void givenTestData_whenDeleting_thenWorksFine() {
         // Given
         Article article = articleRepository.findById(1L).orElseThrow();
         long previousArticleCount = articleRepository.count();
-        long previousArticleComment = articleCommentRepository.count();
-        int deletedCommentSize = article.getArticleComments().size();
+        long previousArticleCommentCount = articleCommentRepository.count();
+        int deletedCommentsSize = article.getArticleComments().size();
 
         // When
         articleRepository.delete(article);
 
         // Then
-        assertThat(articleRepository.count()).isEqualTo(previousArticleCount-1);
-        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleComment-deletedCommentSize);
-
+        assertThat(articleRepository.count()).isEqualTo(previousArticleCount - 1);
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deletedCommentsSize);
     }
+
 }
